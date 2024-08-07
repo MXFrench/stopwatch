@@ -9,13 +9,15 @@ html {
   font-size: 62.5%;
 }
 
-/* Colors */
+/* Variables */
 :root {
   --color-dark: #021526;
   --color-med: #03346E;
   --color-light: #6EACDA;
   --color-lightest: #E2E2B6;
   --color-white: #fff;
+
+  --line-border-thin-light: .5px solid var(--color-lightest);
 }
 
 body {
@@ -44,8 +46,11 @@ body > :not(:last-child) {
   font-weight: 300;
 }
 
-.buttons > .btn:not(:last-child) {
-  margin-right: 2rem;
+.buttons {
+  padding: 0 2rem;
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
 }
 
 .btn {
@@ -63,6 +68,34 @@ body > :not(:last-child) {
 
 .btn:hover {
   background-color: var(--color-med);
+}
+
+.laps {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 0 3rem;
+
+  list-style: none;
+}
+
+.lap {
+  font-size: 2.5rem;
+  display: flex;
+  justify-content: space-between;
+  padding: 1.5rem 0;
+  border-bottom: var(--line-border-thin-light);
+}
+
+.lap-heading {
+  text-transform: uppercase;
+  font-weight: 100;
+  width: 100%;
+  font-weight: 700;
+  letter-spacing: 3px;
+}
+
+.lap-time {
+  font-weight: 100;
 }
 
 @media (max-width: 950px) {
@@ -123,4 +156,8 @@ body > :not(:last-child) {
 ::selection {
   color: var(--color-dark);
   background-color: var(--color-lightest);
+}
+
+.hidden {
+  display: none;
 }

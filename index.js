@@ -2,6 +2,7 @@
 const startBtn = document.getElementById("start");
 const stopBtn = document.getElementById("stop");
 const resetBtn = document.getElementById("reset");
+const lapBtn = document.getElementById("lap");
 
 // Timer element vars
 const minutes = document.getElementById("minutes");
@@ -18,17 +19,22 @@ let time = {
 // Interval var
 let timeIntervalId;
 
+// Function for adding an extra zero if number is single digit
+function addZero(num) {
+  if (num < 10) {
+    return `0${num}`;
+  } else {
+    return `${num}`;
+  }
+}
+
 // Timer functionality
 function count() {
   time.milli++; // Increase milliseconds by 1;
 
   if (time.milli < 100) { // If milli is less than 100, then
     
-    if (time.milli < 10) { // check if milli is less than ten,
-      milli.innerHTML = `0${time.milli}`; // in which case append the 0,
-    } else { // but otherwise just pass the milli to the html;
-      milli.innerHTML = time.milli;
-    }
+    milli.innerHTML = addZero(time.milli);
 
   } else if (time.milli === 100) { // If milli is 100, then
     time.milli = 0; // reset milli to 0
@@ -38,11 +44,7 @@ function count() {
 
     if (time.seconds < 60) { // If seconds is less than 60
 
-      if (time.seconds < 10) { // check if milli is less than 10,
-        seconds.innerHTML = `0${time.seconds}`; // in which case append the 0,
-      } else { // but otherwise just pass the seconds to the html;
-        seconds.innerHTML = time.seconds;
-      }
+      seconds.innerHTML = addZero(time.seconds);
 
     } else if (time.seconds === 60) { // If seconds is 60, then
 
@@ -51,11 +53,7 @@ function count() {
 
       time.minutes++; // Increase minutes by 1;
 
-      if (time.minutes < 10) { // Check if minutes is less than 10,
-        minutes.innerHTML = `0${time.minutes}`; // in which case append the 0,
-      } else { // but otherwise just pass the minutes to the html;
-        minutes.innerHTML = time.minutes;
-      }
+      minutes.innerHTML = addZero(time.minutes);
 
     }
 
@@ -87,7 +85,58 @@ function resetWatch() {
   minutes.innerHTML = "00";
 }
 
+// Find the difference in times
+function diffInTimes(lastTime, thisTime) {
+  // console.log("Last time is " + lastTime);
+  // console.log("This time is " + thisTime);
+  // Find a way to subtract the times and return the difference;
+  const lastTimeMilli = lastTime.slice(-2);
+
+  const lastTimeB = {
+    mil: parseInt(lastTime.slice(-2)),
+    sec: parseInt(lastTime.slice(-5, -3)),
+    min: parseInt(lastTime.slice(-8, -6)),
+  }
+  const thisTimeB = {
+    mil: parseInt(thisTime.slice(-2)),
+    sec: parseInt(thisTime.slice(-5, -3)),
+    min: parseInt(thisTime.slice(-8, -6)),
+  }
+
+  const newTimeB = {
+    mil: 0,
+    sec: 0,
+    min: 0
+  }
+
+  let milTime = thisTimeB.mil - lastTimeB.mil;
+  if (milTime >= 0) {
+    newTimeB.mil = milTime;
+  } else {
+    thisTimeB.sec--;
+    let milTime2 = thisTimeB.mil*60;
+    console.log("take note");
+    console.log(milTime2 - lastTimeB.mil);
+  }
+
+}
+
+let lastLapTime = "00:00:00";
+
+// Lap the watch
+function lapWatch() {
+  const lapsElement = document.querySelector(".laps");
+  if (lapsElement.classList.contains("hidden")) {
+    lapsElement.classList.remove("hidden");
+  }
+
+  let lapTimeString = `${addZero(time.minutes)}:${addZero(time.seconds)}:${addZero(time.milli)}`;
+  diffInTimes(lastLapTime, lapTimeString);
+  lastLapTime = lapTimeString;
+}
+
 // Add event listeners to buttons to call the functions above
 startBtn.addEventListener("click", startWatch);
 stopBtn.addEventListener("click", stopWatch);
 resetBtn.addEventListener("click", resetWatch);
+lapBtn.addEventListener("click", lapWatch);
