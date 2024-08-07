@@ -9,6 +9,14 @@ const minutes = document.getElementById("minutes");
 const seconds = document.getElementById("seconds");
 const milli = document.getElementById("milli");
 
+// Lap element vars
+const lapMinutes = document.getElementById("lapMinutes");
+const lapSeconds = document.getElementById("lapSeconds");
+const lapMilli = document.getElementById("lapMilli");
+
+const lapVar = document.getElementsByClassName("lap");
+let firstLap = true;
+
 // Time var
 let time = {
   milli: 0,
@@ -16,8 +24,15 @@ let time = {
   minutes: 0
 };
 
+let lapTime = {
+  milli: 0,
+  seconds: 0,
+  minutes: 0
+}
+
 // Interval var
 let timeIntervalId;
+let lapTimeIntervalId;
 
 // Function for adding an extra zero if number is single digit
 function addZero(num) {
@@ -60,17 +75,70 @@ function count() {
   }
 }
 
+// Lap timer functionality
+function countLap() {
+  lapTime.milli++; // Increase milliseconds by 1;
+
+  if (lapTime.milli < 100) { // If milli is less than 100, then
+    
+    lapMilli.innerHTML = addZero(lapTime.milli);
+
+  } else if (lapTime.milli === 100) { // If milli is 100, then
+    lapTime.milli = 0; // reset milli to 0
+    lapMilli.innerHTML = "00"; // and the html;
+
+    lapTime.seconds++; // Increase seconds by 1;
+
+    if (lapTime.seconds < 60) { // If seconds is less than 60
+
+      lapSeconds.innerHTML = addZero(lapTime.seconds);
+
+    } else if (lapTime.seconds === 60) { // If seconds is 60, then
+
+      lapTime.seconds = 0; // reset seconds to 0
+      lapSeconds.innerHTML = "00"; // and the html;
+
+      lapTime.minutes++; // Increase minutes by 1;
+
+      lapMinutes.innerHTML = addZero(lapTime.minutes);
+
+    }
+
+  }
+}
+
 // Starts the watch
 function startWatch() {
+  // Start main watch
   if (!timeIntervalId) {
     timeIntervalId = setInterval(count, 10);
+  }
+  // Start lap watch
+  if (!lapTimeIntervalId) {
+    lapTimeIntervalId = setInterval(countLap, 10);
   }
 }
 
 // Stops the watch
 function stopWatch() {
+  // Stop the main clock
   clearInterval(timeIntervalId);
   timeIntervalId = null;
+  // Stop the lap clock
+  clearInterval(lapTimeIntervalId);
+  lapTimeIntervalId = null;
+}
+
+// Resets the lap watch
+function resetLapWatch() {
+  lapTime = {
+    milli: 0,
+    seconds: 0,
+    minutes: 0
+  };
+  lapMilli.innerHTML = "00";
+  lapSeconds.innerHTML = "00";
+  lapMinutes.innerHTML = "00";
 }
 
 // Resets the watch
@@ -83,56 +151,34 @@ function resetWatch() {
   milli.innerHTML = "00";
   seconds.innerHTML = "00";
   minutes.innerHTML = "00";
+
+  // And reset the lap watch
+  resetLapWatch();
 }
-
-// Find the difference in times
-function diffInTimes(lastTime, thisTime) {
-  // console.log("Last time is " + lastTime);
-  // console.log("This time is " + thisTime);
-  // Find a way to subtract the times and return the difference;
-  const lastTimeMilli = lastTime.slice(-2);
-
-  const lastTimeB = {
-    mil: parseInt(lastTime.slice(-2)),
-    sec: parseInt(lastTime.slice(-5, -3)),
-    min: parseInt(lastTime.slice(-8, -6)),
-  }
-  const thisTimeB = {
-    mil: parseInt(thisTime.slice(-2)),
-    sec: parseInt(thisTime.slice(-5, -3)),
-    min: parseInt(thisTime.slice(-8, -6)),
-  }
-
-  const newTimeB = {
-    mil: 0,
-    sec: 0,
-    min: 0
-  }
-
-  let milTime = thisTimeB.mil - lastTimeB.mil;
-  if (milTime >= 0) {
-    newTimeB.mil = milTime;
-  } else {
-    thisTimeB.sec--;
-    let milTime2 = thisTimeB.mil*60;
-    console.log("take note");
-    console.log(milTime2 - lastTimeB.mil);
-  }
-
-}
-
-let lastLapTime = "00:00:00";
 
 // Lap the watch
 function lapWatch() {
+  // Open Laps element if not opened
   const lapsElement = document.querySelector(".laps");
   if (lapsElement.classList.contains("hidden")) {
     lapsElement.classList.remove("hidden");
   }
 
-  let lapTimeString = `${addZero(time.minutes)}:${addZero(time.seconds)}:${addZero(time.milli)}`;
-  diffInTimes(lastLapTime, lapTimeString);
-  lastLapTime = lapTimeString;
+  // Add new lap element with lap
+  const newLapTime = `${addZero(lapTime.minutes)}:${addZero(lapTime.seconds)}:${addZero(lapTime.milli)}`;
+  if (firstLap) {
+    document.querySelector(".laps").lastElementChild.lastElementChild.innerHTML = newLapTime;
+    firstLap = false;
+  } else {
+    const lapNode = document.querySelector(".laps").lastElementChild;
+    const newLap = lapNode.cloneNode(true);
+    newLap.lastElementChild.innerHTML = newLapTime;
+    newLap.firstElementChild.innerHTML = `Lap ${lapVar.length}`;
+    document.querySelector(".laps").appendChild(newLap);  
+  }
+
+  // Reset lap time
+  resetLapWatch();
 }
 
 // Add event listeners to buttons to call the functions above
@@ -140,3 +186,6 @@ startBtn.addEventListener("click", startWatch);
 stopBtn.addEventListener("click", stopWatch);
 resetBtn.addEventListener("click", resetWatch);
 lapBtn.addEventListener("click", lapWatch);
+
+
+/// Next todo: Delete lap items after reset button is pushed.
