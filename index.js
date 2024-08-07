@@ -15,6 +15,7 @@ const lapSeconds = document.getElementById("lapSeconds");
 const lapMilli = document.getElementById("lapMilli");
 
 const lapVar = document.getElementsByClassName("lap");
+const lapsNode = document.querySelector(".laps");
 let firstLap = true;
 
 // Time var
@@ -24,6 +25,7 @@ let time = {
   minutes: 0
 };
 
+// Lap time var
 let lapTime = {
   milli: 0,
   seconds: 0,
@@ -129,6 +131,18 @@ function stopWatch() {
   lapTimeIntervalId = null;
 }
 
+// Function to delete lap items
+function resetLapTable() {
+  // Delete the children from the laps container, but keep the laps header and first lap row
+  lapsNode.replaceChildren(lapsNode.firstElementChild, lapsNode.firstElementChild.nextElementSibling);
+
+  // Hide laps container with the class "hidden"
+  lapsNode.classList.add("hidden");
+
+  // Reset the firstLap variable to true
+  firstLap = true;
+}
+
 // Resets the lap watch
 function resetLapWatch() {
   lapTime = {
@@ -154,27 +168,29 @@ function resetWatch() {
 
   // And reset the lap watch
   resetLapWatch();
+
+  // Delete extra lap items
+  resetLapTable();
 }
 
 // Lap the watch
 function lapWatch() {
   // Open Laps element if not opened
-  const lapsElement = document.querySelector(".laps");
-  if (lapsElement.classList.contains("hidden")) {
-    lapsElement.classList.remove("hidden");
+  if (lapsNode.classList.contains("hidden")) {
+    lapsNode.classList.remove("hidden");
   }
 
   // Add new lap element with lap
   const newLapTime = `${addZero(lapTime.minutes)}:${addZero(lapTime.seconds)}:${addZero(lapTime.milli)}`;
-  if (firstLap) {
-    document.querySelector(".laps").lastElementChild.lastElementChild.innerHTML = newLapTime;
+  if (firstLap) { // If it's the first lap, just replace the text in the first lap row
+    lapsNode.lastElementChild.lastElementChild.innerHTML = newLapTime;
     firstLap = false;
-  } else {
-    const lapNode = document.querySelector(".laps").lastElementChild;
+  } else { // Otherwise, clone the last lap row, update time, and append it
+    const lapNode = lapsNode.lastElementChild;
     const newLap = lapNode.cloneNode(true);
     newLap.lastElementChild.innerHTML = newLapTime;
     newLap.firstElementChild.innerHTML = `Lap ${lapVar.length}`;
-    document.querySelector(".laps").appendChild(newLap);  
+    lapsNode.appendChild(newLap);  
   }
 
   // Reset lap time
@@ -186,6 +202,3 @@ startBtn.addEventListener("click", startWatch);
 stopBtn.addEventListener("click", stopWatch);
 resetBtn.addEventListener("click", resetWatch);
 lapBtn.addEventListener("click", lapWatch);
-
-
-/// Next todo: Delete lap items after reset button is pushed.
